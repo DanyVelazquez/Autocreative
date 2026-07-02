@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Creative Asset Autopilot</title>
+  <style>
+    :root {
+      --green: #00c98d;
+      --green-dark: #00a373;
+      --green-dim: rgba(0,201,141,0.10);
+      --black: #0a0a0a;
+      --white: #ffffff;
+      --surface: #f7f6f3;
+      --surface2: #efefeb;
+      --border: #e2e0da;
+      --text: #1a1a1a;
+      --muted: #6b6b6b;
+      --hint: #a0a09a;
+      --danger: #dc2626;
+      --info-bg: #e8f4fd;
+      --info-text: #0c5c8a;
+      --r: 10px;
+      --rlg: 16px;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: var(--surface);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: var(--black);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .brand-mark {
+      width: 28px; height: 28px;
+      background: var(--green);
+      border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 900; color: var(--black);
+    }
+    .brand-name {
+      font-size: 14px; font-weight: 700;
+      color: var(--white); letter-spacing: -.01em;
+    }
+    .lang-toggle {
+      display: flex; gap: 4px;
+      background: rgba(255,255,255,.08);
+      border-radius: 8px; padding: 3px;
+    }
+    .lang-btn {
+      padding: 4px 14px;
+      border-radius: 6px;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer;
+      color: rgba(255,255,255,.45);
+      border: none; background: none;
+      font-family: inherit;
+      transition: all .15s;
+    }
+    .lang-btn.active { background: var(--white); color: var(--black); }
+
+    /* ── HERO ── */
+    .hero {
+      background: var(--black);
+      padding: 32px 24px 28px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .hero-inner { max-width: 680px; margin: 0 auto; }
+    .hero-eyebrow {
+      font-size: 10px; font-weight: 600;
+      letter-spacing: .09em; text-transform: uppercase;
+      color: rgba(255,255,255,.3);
+      margin-bottom: 10px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .hero-eyebrow::before { content:''; width: 16px; height: 1px; background: rgba(255,255,255,.15); display: block; }
+    .hero h1 {
+      font-size: clamp(22px,4vw,32px);
+      font-weight: 700;
+      color: var(--white);
+      line-height: 1.15;
+      letter-spacing: -.02em;
+      margin-bottom: 10px;
+    }
+    .hero h1 em { font-style: normal; color: var(--green); }
+    .hero-desc {
+      font-size: 14px;
+      color: rgba(255,255,255,.45);
+      line-height: 1.65;
+      margin-bottom: 18px;
+    }
+    .pills { display: flex; flex-wrap: wrap; gap: 7px; }
+    .pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 6px 12px;
+      border: 1px solid rgba(255,255,255,.1);
+      border-radius: 100px;
+      font-size: 12px; color: rgba(255,255,255,.4);
+    }
+    .pill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    /* ── LANG BANNER ── */
+    .lang-banner {
+      background: var(--info-bg);
+      border-bottom: 1px solid #c8e4f7;
+      padding: 9px 24px;
+      font-size: 12px;
+      color: var(--info-text);
+    }
+    .lang-banner-inner { max-width: 680px; margin: 0 auto; }
+
+    /* ── PROGRESS ── */
+    .progress-wrap { height: 3px; background: var(--surface2); }
+    .progress-bar { height: 100%; width: 0%; background: var(--green); transition: width .4s ease; }
+
+    /* ── FORM WRAP ── */
+    .form-wrap { max-width: 680px; margin: 0 auto; padding: 0 20px 48px; }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--rlg);
+      padding: 28px;
+      margin-top: 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,.06);
+    }
+
+    /* ── SECTION ── */
+    .fsec { margin-bottom: 22px; padding-bottom: 22px; border-bottom: 1px solid var(--border); }
+    .fsec:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .sec-label {
+      font-size: 10px; font-weight: 700;
+      color: var(--hint);
+      letter-spacing: .09em; text-transform: uppercase;
+      margin-bottom: 14px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .sec-label::after { content:''; flex:1; height:1px; background: var(--border); display: block; }
+
+    /* ── FIELDS ── */
+    .field { margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+    .flabel {
+      display: block;
+      font-size: 12px; font-weight: 600;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+    .flabel .req { color: var(--green); margin-left: 1px; }
+    .flabel .opt { font-size: 11px; font-weight: 400; color: var(--hint); margin-left: 4px; }
+    .fhint { font-size: 11px; color: var(--hint); margin-top: 4px; line-height: 1.5; }
+    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+    input[type=text], input[type=email], textarea, select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      color: var(--text);
+      font-family: inherit;
+      font-size: 14px;
+      padding: 10px 13px;
+      outline: none;
+      transition: border-color .15s, box-shadow .15s;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type=text]:focus, input[type=email]:focus, textarea:focus, select:focus {
+      border-color: var(--black);
+      box-shadow: 0 0 0 3px rgba(0,0,0,.06);
+      background: var(--white);
+    }
+    input::placeholder, textarea::placeholder { color: var(--hint); font-size: 13px; }
+    textarea { resize: vertical; min-height: 84px; line-height: 1.6; }
+    select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236b6b6b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 13px center;
+      padding-right: 34px;
+      cursor: pointer;
+    }
+
+    /* ── PLATFORMS ── */
+    .plat-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 7px; }
+    .plat-chip {
+      padding: 9px 10px;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-size: 12px; color: var(--muted);
+      display: flex; align-items: center; gap: 7px;
+      cursor: pointer;
+      transition: all .15s;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .plat-chip.on { border-color: var(--green); background: var(--green-dim); color: #085041; }
+    .plat-chip input[type=checkbox] { display: none; }
+    .plat-check {
+      width: 14px; height: 14px;
+      border: 1.5px solid var(--border);
+      border-radius: 4px;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .plat-chip.on .plat-check {
+      background: var(--green); border-color: var(--green);
+    }
+    .plat-chip.on .plat-check::after {
+      content: '';
+      width: 8px; height: 5px;
+      border-left: 1.5px solid white;
+      border-bottom: 1.5px solid white;
+      transform: rotate(-45deg) translateY(-1px);
+      display: block;
+    }
+
+    /* ── UPLOAD ── */
+    .upload-zone {
+      border: 1.5px dashed var(--border);
+      border-radius: var(--rlg);
+      padding: 20px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .2s;
+      background: var(--surface);
+      position: relative;
+    }
+    .upload-zone:hover { border-color: var(--green); background: var(--green-dim); }
+    .upload-zone input[type=file] {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      opacity: 0; cursor: pointer; font-size: 0;
+    }
+    .upload-icon {
+      width: 38px; height: 38px;
+      background: var(--surface2);
+      border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 9px;
+    }
+    .upload-icon svg { width: 18px; height: 18px; stroke: var(--muted); fill: none; stroke-width: 1.5; }
+    .upload-title { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 3px; }
+    .upload-sub { font-size: 11px; color: var(--hint); }
+    .upload-preview {
+      display: none; align-items: center; gap: 10px;
+      padding: 9px 12px;
+      background: var(--surface);
+      border-radius: var(--r);
+      border: 1px solid var(--border);
+      margin-top: 8px;
+    }
+    .upload-preview.show { display: flex; }
+    .prev-img { width: 38px; height: 38px; border-radius: 6px; object-fit: cover; border: 1px solid var(--border); flex-shrink: 0; }
+    .prev-info { flex:1; min-width:0; }
+    .prev-name { font-size: 12px; font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .prev-size { font-size: 11px; color: var(--hint); }
+    .prev-rm { background: none; border: none; color: var(--hint); cursor: pointer; font-size: 18px; padding: 2px; line-height: 1; flex-shrink: 0; }
+    .prev-rm:hover { color: var(--danger); }
+
+    /* ── REVIEW BOX ── */
+    .review-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 3px solid var(--green);
+      border-radius: var(--r);
+      padding: 13px 16px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      margin-bottom: 18px;
+    }
+
+    /* ── ACTIONS ── */
+    .actions { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .btn-submit {
+      padding: 13px 24px;
+      background: var(--black);
+      color: var(--white);
+      border: none;
+      border-radius: var(--r);
+      font-family: inherit;
+      font-size: 14px; font-weight: 700;
+      cursor: pointer;
+      display: flex; align-items: center; gap: 8px;
+      transition: opacity .2s, transform .15s;
+      -webkit-tap-highlight-color: transparent;
+      min-width: 200px; justify-content: center;
+    }
+    .btn-submit:disabled { opacity: .55; cursor: not-allowed; transform: none; }
+    .btn-submit:not(:disabled):active { opacity: .85; transform: scale(.99); }
+    .btn-arrow {
+      width: 20px; height: 20px;
+      background: var(--green);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .btn-arrow svg { width: 10px; height: 10px; stroke: var(--black); fill: none; stroke-width: 2.5; }
+    .btn-test {
+      padding: 10px 16px;
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      font-family: inherit;
+      font-size: 12px; font-weight: 600;
+      cursor: pointer;
+      color: var(--muted);
+      transition: all .15s;
+    }
+    .btn-test:hover { border-color: var(--text); color: var(--text); }
+    .status-text { font-size: 12px; color: var(--hint); }
+
+    /* ── LOADING SCREEN ── */
+    .loading-screen {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(10,10,10,.92);
+      z-index: 9999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+    }
+    .loading-screen.show { display: flex; }
+    .loading-logo {
+      width: 48px; height: 48px;
+      background: var(--green);
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 900; color: var(--black);
+      margin-bottom: 28px;
+    }
+    .loading-title {
+      font-size: 20px; font-weight: 700;
+      color: var(--white);
+      letter-spacing: -.02em;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+    .loading-sub {
+      font-size: 13px;
+      color: rgba(255,255,255,.4);
+      margin-bottom: 36px;
+      text-align: center;
+    }
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      width: 100%;
+      max-width: 360px;
+      margin-bottom: 40px;
+    }
+    .loading-step {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      position: relative;
+      padding-bottom: 20px;
+    }
+    .loading-step:last-child { padding-bottom: 0; }
+    .loading-step:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 15px; top: 32px;
+      width: 1px; height: calc(100% - 12px);
+      background: rgba(255,255,255,.08);
+    }
+    .step-dot {
+      width: 30px; height: 30px;
+      border-radius: 50%;
+      border: 1.5px solid rgba(255,255,255,.12);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      font-size: 11px; font-weight: 700;
+      color: rgba(255,255,255,.25);
+      transition: all .4s;
+      position: relative;
+    }
+    .step-dot.active {
+      border-color: var(--green);
+      color: var(--green);
+      background: var(--green-dim);
+    }
+    .step-dot.done {
+      border-color: var(--green);
+      background: var(--green);
+      color: var(--black);
+    }
+    .step-dot.active::after {
+      content: '';
+      position: absolute;
+      inset: -4px;
+      border-radius: 50%;
+      border: 1px solid var(--green);
+      opacity: .4;
+      animation: pulse-ring 1.8s ease-out infinite;
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(1); opacity: .4; }
+      100% { transform: scale(1.6); opacity: 0; }
+    }
+    .step-info { padding-top: 5px; }
+    .step-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,.85); margin-bottom: 2px; }
+    .step-desc { font-size: 11px; color: rgba(255,255,255,.35); line-height: 1.5; }
+
+    /* Spinner circles */
+    .spinner-wrap {
+      display: flex; gap: 7px;
+      margin-top: 4px;
+    }
+    .spinner-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--green);
+      opacity: .3;
+      animation: blink 1.4s ease-in-out infinite;
+    }
+    .spinner-dot:nth-child(2) { animation-delay: .2s; }
+    .spinner-dot:nth-child(3) { animation-delay: .4s; }
+    @keyframes blink {
+      0%, 80%, 100% { opacity: .3; transform: scale(1); }
+      40% { opacity: 1; transform: scale(1.3); }
+    }
+
+    .loading-timer {
+      font-size: 11px;
+      color: rgba(255,255,255,.25);
+      display: flex; align-items: center; gap: 6px;
+    }
+    .loading-timer-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); animation: blink 1.4s ease-in-out infinite; }
+
+    /* ── SUCCESS ── */
+    .success-screen {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 64px 24px;
+      max-width: 480px;
+      margin: 0 auto;
+    }
+    .success-screen.show { display: flex; }
+    .success-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: var(--green-dim);
+      border: 1.5px solid var(--green);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 20px;
+    }
+    .success-icon svg { width: 26px; height: 26px; stroke: var(--green); fill: none; stroke-width: 2.5; }
+    .success-title { font-size: 22px; font-weight: 700; letter-spacing: -.02em; margin-bottom: 8px; }
+    .success-desc { font-size: 14px; color: var(--muted); max-width: 320px; line-height: 1.7; margin-bottom: 20px; }
+    .success-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      padding: 9px 16px;
+      font-size: 12px; color: var(--muted);
+    }
+    .success-pill svg { width: 13px; height: 13px; stroke: var(--green); fill: none; stroke-width: 2; }
+
+    /* ── DEBUG ── */
+    .debug-box {
+      display: none;
+      position: fixed; right: 16px; bottom: 16px;
+      z-index: 9999;
+      background: #111; color: #d1fae5;
+      border: 1px solid var(--green);
+      border-radius: 10px;
+      padding: 12px;
+      max-width: 380px; max-height: 280px;
+      overflow: auto;
+      font-family: monospace; font-size: 11px;
+      white-space: pre-wrap;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media(max-width:520px) {
+      .two { grid-template-columns: 1fr; }
+      .plat-grid { grid-template-columns: repeat(2,1fr); }
+      .form-wrap { padding: 0 14px 48px; }
+      .card { padding: 20px; }
+    }
+    @media(max-width:360px) {
+      .hero h1 { font-size: 20px; }
+      .plat-grid { grid-template-columns: 1fr 1fr; }
+      .btn-submit { font-size: 13px; padding: 12px 18px; min-width: unset; width: 100%; }
+    }
+    @media(prefers-reduced-motion:reduce) { *{ transition:none!important; animation:none!important; } }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<header class="topbar">
+  <div class="brand">
+    <div class="brand-mark">A</div>
+    <span class="brand-name">AutoCreative</span>
+  </div>
+  <div class="lang-toggle">
+    <button class="lang-btn" id="btn-en" type="button" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" id="btn-es" type="button" onclick="setLang('es')">ES</button>
+  </div>
+</header>
+
+<!-- PROGRESS -->
+<div class="progress-wrap"><div class="progress-bar" id="progress"></div></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-eyebrow">Autopilot creative agent</div>
+    <h1 id="hero-title">From one product image<br>to a <em>complete campaign.</em></h1>
+    <p class="hero-desc" id="hero-desc">Fill out this brief and receive a complete marketing package — bilingual copies + promo video — ready for your review in ~20 minutes.</p>
+    <div class="pills">
+      <div class="pill"><span class="pill-dot"></span><span id="pill-time">~20 min turnaround</span></div>
+      <div class="pill"><span class="pill-dot"></span><span id="pill-human">You approve before final delivery</span></div>
+      <div class="pill"><span class="pill-dot"></span><span id="pill-lang">Auto-detected language</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- LANG BANNER -->
+<div class="lang-banner">
+  <div class="lang-banner-inner" id="lang-banner">Language detected: English — your campaign assets will be generated in English first.</div>
+</div>
+
+<!-- FORM -->
+<div class="form-wrap" id="mainForm">
+  <form class="card" id="campaignForm">
+
+    <div class="fsec">
+      <div class="sec-label">Business info</div>
+      <div class="two">
+        <div class="field">
+          <label class="flabel" for="businessName" id="lbl-business">Business name <span class="req">*</span></label>
+          <input type="text" id="businessName" required placeholder="Café Aroma"/>
+        </div>
+        <div class="field">
+          <label class="flabel" for="clientEmail" id="lbl-email">Client email <span class="req">*</span></label>
+          <input type="email" id="clientEmail" required placeholder="client@example.com"/>
+        </div>
+      </div>
+      <div class="field">
+        <label class="flabel" for="product" id="lbl-product">Product / service <span class="req">*</span></label>
+        <textarea id="product" required placeholder="Premium specialty coffee served in a modern local café."></textarea>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="sec-label">Campaign details</div>
+      <div class="two">
+        <div class="field">
+          <label class="flabel" for="objective" id="lbl-objective">Campaign objective <span class="req">*</span></label>
+          <select id="objective" required>
+            <option value="Increase brand awareness">Increase brand awareness</option>
+            <option value="Drive sales">Drive sales</option>
+            <option value="Increase foot traffic">Increase foot traffic</option>
+            <option value="Grow social media community">Grow social media community</option>
+            <option value="Promote an event">Promote an event</option>
+            <option value="Product launch">Product launch</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="flabel" for="tone" id="lbl-tone">Creative tone <span class="req">*</span></label>
+          <select id="tone" required>
+            <option value="Premium and cinematic">Premium and cinematic</option>
+            <option value="Warm and human">Warm and human</option>
+            <option value="Bold and energetic">Bold and energetic</option>
+            <option value="Clean and professional">Clean and professional</option>
+            <option value="Playful and social">Playful and social</option>
+            <option value="Luxury and elegant">Luxury and elegant</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="flabel" for="audience" id="lbl-audience">Target audience <span class="req">*</span></label>
+        <input type="text" id="audience" required placeholder="Young professionals 25–35, coffee lovers, urban lifestyle"/>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="sec-label">Platforms</div>
+      <div class="plat-grid" id="platGrid">
+        <div class="plat-chip on" onclick="togglePlat(this)" data-val="Instagram">
+          <div class="plat-check"></div>Instagram
+        </div>
+        <div class="plat-chip on" onclick="togglePlat(this)" data-val="Facebook">
+          <div class="plat-check"></div>Facebook
+        </div>
+        <div class="plat-chip on" onclick="togglePlat(this)" data-val="WhatsApp">
+          <div class="plat-check"></div>WhatsApp
+        </div>
+        <div class="plat-chip" onclick="togglePlat(this)" data-val="TikTok">
+          <div class="plat-check"></div>TikTok
+        </div>
+        <div class="plat-chip" onclick="togglePlat(this)" data-val="LinkedIn">
+          <div class="plat-check"></div>LinkedIn
+        </div>
+        <div class="plat-chip" onclick="togglePlat(this)" data-val="Email">
+          <div class="plat-check"></div>Email
+        </div>
+      </div>
+    </div>
+
+    <div class="fsec">
+      <div class="sec-label">Creative assets</div>
+      <div class="field">
+        <label class="flabel" id="lbl-image">Product image <span class="opt" id="opt-txt">(optional)</span></label>
+        <div class="upload-zone" id="uploadZone">
+          <input type="file" id="productImage" accept="image/*"/>
+          <div class="upload-icon">
+            <svg viewBox="0 0 24 24"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+          </div>
+          <div class="upload-title" id="upload-title">Drop image here or tap to browse</div>
+          <div class="upload-sub" id="upload-hint">JPG or PNG · Used to generate your promo video</div>
+        </div>
+        <div class="upload-preview" id="uploadPreview">
+          <img class="prev-img" id="prevImg" src="" alt="Preview"/>
+          <div class="prev-info">
+            <div class="prev-name" id="prevName"></div>
+            <div class="prev-size" id="prevSize"></div>
+          </div>
+          <button type="button" class="prev-rm" id="prevRm">&#215;</button>
+        </div>
+      </div>
+      <div class="field">
+        <label class="flabel" for="specialInstructions" id="lbl-instructions">Special instructions <span class="opt">(optional)</span></label>
+        <textarea id="specialInstructions" placeholder="Example: Mention 20% off this weekend. Keep it premium. Avoid prices."></textarea>
+      </div>
+      <div class="field">
+        <label class="flabel" for="offerOrCta" id="lbl-cta">Offer or CTA <span class="opt">(optional)</span></label>
+        <input type="text" id="offerOrCta" placeholder="Visit us today / Book now / Order online"/>
+      </div>
+    </div>
+
+    <div class="review-box" id="reviewBox">
+      Human-in-the-loop: You will receive a review email. You can approve the final version or request unlimited changes before delivery.
+    </div>
+
+    <div class="actions">
+      <button class="btn-submit" id="submitBtn" type="submit">
+        <span id="btn-label">Generate Assets</span>
+        <div class="btn-arrow">
+          <svg viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+        </div>
+      </button>
+      <button class="btn-test" type="button" onclick="testBackend()" id="testBtn">Test backend</button>
+      <span class="status-text" id="statusText"></span>
+    </div>
+
+  </form>
+</div>
+
+<!-- LOADING SCREEN -->
+<div class="loading-screen" id="loadingScreen">
+  <div class="loading-logo">A</div>
+  <div class="loading-title" id="loading-title">Generating your campaign</div>
+  <div class="loading-sub" id="loading-sub">Sit tight — your AI agent is working on it</div>
+
+  <div class="loading-steps">
+    <div class="loading-step">
+      <div class="step-dot done" id="step1-dot">&#10003;</div>
+      <div class="step-info">
+        <div class="step-name" id="step1-name">Brief received</div>
+        <div class="step-desc" id="step1-desc">Your data is being processed</div>
+      </div>
+    </div>
+    <div class="loading-step">
+      <div class="step-dot active" id="step2-dot">02</div>
+      <div class="step-info">
+        <div class="step-name" id="step2-name">Qwen generating copies</div>
+        <div class="step-desc" id="step2-desc">Strategy, hook, platform copy, voiceover</div>
+        <div class="spinner-wrap" id="spinner2">
+          <div class="spinner-dot"></div>
+          <div class="spinner-dot"></div>
+          <div class="spinner-dot"></div>
+        </div>
+      </div>
+    </div>
+    <div class="loading-step">
+      <div class="step-dot" id="step3-dot">03</div>
+      <div class="step-info">
+        <div class="step-name" id="step3-name">Wan generating video</div>
+        <div class="step-desc" id="step3-desc">Animating your product image · 480p preview</div>
+      </div>
+    </div>
+    <div class="loading-step">
+      <div class="step-dot" id="step4-dot">04</div>
+      <div class="step-info">
+        <div class="step-name" id="step4-name">Sending review email</div>
+        <div class="step-desc" id="step4-desc">You'll receive it in your inbox</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loading-timer">
+    <div class="loading-timer-dot"></div>
+    <span id="loading-timer">Estimated time: ~20 minutes</span>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div class="success-screen" id="success">
+  <div class="success-icon">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <h2 class="success-title" id="suc-title">Brief received!</h2>
+  <p class="success-desc" id="suc-desc">Our AI agent is generating your campaign. Check your inbox in ~20 minutes — you'll approve or request changes directly from the email.</p>
+  <div class="success-pill">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span id="suc-pill">Ready in ~20 minutes</span>
+  </div>
+</div>
+
+<div id="debugBox" class="debug-box"></div>
+
+<script>
+  var currentLang = 'en';
+  var imageBase64 = '';
+
+  var copy = {
+    en: {
+      heroTitle: 'From one product image to a <em>complete campaign.</em>',
+      heroDesc: 'Fill out this brief and receive a complete marketing package — bilingual copies + promo video — ready for your review in ~20 minutes.',
+      pillTime: '~20 min turnaround', pillHuman: 'You approve before final delivery', pillLang: 'Auto-detected language',
+      langBanner: 'Language detected: English — your campaign assets will be generated in English first.',
+      business: 'Business name', email: 'Client email', product: 'Product / service',
+      objective: 'Campaign objective', tone: 'Creative tone', audience: 'Target audience',
+      platforms: 'Platforms', image: 'Product image', opt: '(optional)',
+      uploadTitle: 'Drop image here or tap to browse', uploadHint: 'JPG or PNG · Used to generate your promo video',
+      instructions: 'Special instructions', cta: 'Offer or CTA',
+      review: 'Human-in-the-loop: You will receive a review email. You can approve the final version or request unlimited changes before delivery.',
+      submit: 'Generate Assets', sending: 'Submitting...',
+      loadingTitle: 'Generating your campaign', loadingSub: 'Sit tight — your AI agent is working on it',
+      step1: 'Brief received', step1d: 'Your data is being processed',
+      step2: 'Qwen generating copies', step2d: 'Strategy, hook, platform copy, voiceover',
+      step3: 'HappyHorse generating video', step3d: 'Animating your product image · 480p preview',
+      step4: 'Sending review email', step4d: "You'll receive it in your inbox",
+      timer: 'Estimated time: ~20 minutes',
+      successTitle: 'Brief received!',
+      successDesc: "Our AI agent is generating your campaign. Check your inbox in ~20 minutes — you'll approve or request changes directly from the email.",
+      successPill: 'Ready in ~20 minutes'
+    },
+    es: {
+      heroTitle: 'De una imagen de producto a una <em>campaña completa.</em>',
+      heroDesc: 'Completa este brief y recibe un paquete de marketing completo: copies bilingües + video, listo para revisión en ~20 minutos.',
+      pillTime: '~20 min de entrega', pillHuman: 'Apruebas antes de la entrega final', pillLang: 'Idioma detectado automáticamente',
+      langBanner: 'Idioma detectado: Español — tus assets se generarán primero en español.',
+      business: 'Nombre del negocio', email: 'Correo del cliente', product: 'Producto / servicio',
+      objective: 'Objetivo de campaña', tone: 'Tono creativo', audience: 'Público objetivo',
+      platforms: 'Plataformas', image: 'Imagen del producto', opt: '(opcional)',
+      uploadTitle: 'Arrastra tu imagen o toca para subir', uploadHint: 'JPG o PNG · Se usa para generar tu video promocional',
+      instructions: 'Instrucciones especiales', cta: 'Oferta o CTA',
+      review: 'Human-in-the-loop: Recibirás un email de revisión. Puedes aprobar la versión final o pedir cambios ilimitados antes de la entrega.',
+      submit: 'Generar assets', sending: 'Enviando...',
+      loadingTitle: 'Generando tu campaña', loadingSub: 'Un momento — tu agente de IA está trabajando',
+      step1: 'Brief recibido', step1d: 'Tus datos están siendo procesados',
+      step2: 'Qwen generando copies', step2d: 'Estrategia, hook, copy por plataforma, voz',
+      step3: 'HappyHorse generando video', step3d: 'Animando tu imagen de producto · preview 480p',
+      step4: 'Enviando email de revisión', step4d: 'Lo recibirás en tu bandeja de entrada',
+      timer: 'Tiempo estimado: ~20 minutos',
+      successTitle: '¡Brief recibido!',
+      successDesc: 'Nuestro agente de IA está generando tu campaña. Revisa tu correo en ~20 minutos; podrás aprobar o pedir cambios desde el email.',
+      successPill: 'Listo en ~20 minutos'
+    }
+  };
+
+  function detectLanguage() {
+    return (navigator.language || 'en').toLowerCase().startsWith('es') ? 'es' : 'en';
+  }
+
+  function setLang(lang) {
+    currentLang = lang;
+    var c = copy[lang];
+    document.getElementById('btn-en').classList.toggle('active', lang === 'en');
+    document.getElementById('btn-es').classList.toggle('active', lang === 'es');
+    document.getElementById('hero-title').innerHTML = c.heroTitle;
+    document.getElementById('hero-desc').textContent = c.heroDesc;
+    document.getElementById('pill-time').textContent = c.pillTime;
+    document.getElementById('pill-human').textContent = c.pillHuman;
+    document.getElementById('pill-lang').textContent = c.pillLang;
+    document.getElementById('lang-banner').textContent = c.langBanner;
+    document.getElementById('lbl-business').innerHTML = c.business + ' <span class="req">*</span>';
+    document.getElementById('lbl-email').innerHTML = c.email + ' <span class="req">*</span>';
+    document.getElementById('lbl-product').innerHTML = c.product + ' <span class="req">*</span>';
+    document.getElementById('lbl-objective').innerHTML = c.objective + ' <span class="req">*</span>';
+    document.getElementById('lbl-tone').innerHTML = c.tone + ' <span class="req">*</span>';
+    document.getElementById('lbl-audience').innerHTML = c.audience + ' <span class="req">*</span>';
+    document.getElementById('lbl-image').innerHTML = c.image + ' <span class="opt">' + c.opt + '</span>';
+    document.getElementById('opt-txt').textContent = c.opt;
+    document.getElementById('upload-title').textContent = c.uploadTitle;
+    document.getElementById('upload-hint').textContent = c.uploadHint;
+    document.getElementById('lbl-instructions').innerHTML = c.instructions + ' <span class="opt">' + c.opt + '</span>';
+    document.getElementById('lbl-cta').innerHTML = c.cta + ' <span class="opt">' + c.opt + '</span>';
+    document.getElementById('reviewBox').textContent = c.review;
+    document.getElementById('btn-label').textContent = c.submit;
+    document.getElementById('loading-title').textContent = c.loadingTitle;
+    document.getElementById('loading-sub').textContent = c.loadingSub;
+    document.getElementById('step1-name').textContent = c.step1;
+    document.getElementById('step1-desc').textContent = c.step1d;
+    document.getElementById('step2-name').textContent = c.step2;
+    document.getElementById('step2-desc').textContent = c.step2d;
+    document.getElementById('step3-name').textContent = c.step3;
+    document.getElementById('step3-desc').textContent = c.step3d;
+    document.getElementById('step4-name').textContent = c.step4;
+    document.getElementById('step4-desc').textContent = c.step4d;
+    document.getElementById('loading-timer').textContent = c.timer;
+    document.getElementById('suc-title').textContent = c.successTitle;
+    document.getElementById('suc-desc').textContent = c.successDesc;
+    document.getElementById('suc-pill').textContent = c.successPill;
+  }
+
+  function togglePlat(el) {
+    el.classList.toggle('on');
+    updateProgress();
+  }
+
+  function getPlatforms() {
+    return Array.from(document.querySelectorAll('.plat-chip.on')).map(function(el) { return el.dataset.val; });
+  }
+
+  function updateProgress() {
+    var fields = ['businessName', 'clientEmail', 'product', 'audience'];
+    var filled = fields.filter(function(id) { return document.getElementById(id).value.trim(); }).length;
+    var pct = Math.round((filled / fields.length) * 100);
+    document.getElementById('progress').style.width = pct + '%';
+  }
+
+  // Loading steps animation
+  var stepTimer = null;
+  function startLoadingAnimation() {
+    document.getElementById('loadingScreen').classList.add('show');
+    var step = 2;
+    stepTimer = setInterval(function() {
+      if (step > 4) { clearInterval(stepTimer); return; }
+      var prev = document.getElementById('step' + (step - 1) + '-dot');
+      var curr = document.getElementById('step' + step + '-dot');
+      var prevSpinner = document.getElementById('spinner' + (step - 1));
+      if (prev) { prev.className = 'step-dot done'; prev.textContent = '\u2713'; }
+      if (prevSpinner) prevSpinner.style.display = 'none';
+      if (curr) {
+        curr.className = 'step-dot active';
+        curr.textContent = '0' + step;
+      }
+      var spinner = document.getElementById('spinner' + step);
+      if (!spinner) {
+        var info = document.querySelector('#step' + step + '-dot + .step-info');
+        if (info) {
+          var sw = document.createElement('div');
+          sw.className = 'spinner-wrap'; sw.id = 'spinner' + step;
+          sw.innerHTML = '<div class="spinner-dot"></div><div class="spinner-dot"></div><div class="spinner-dot"></div>';
+          info.appendChild(sw);
+        }
+      }
+      step++;
+    }, 18000);
+  }
+
+  function stopLoadingAnimation() {
+    if (stepTimer) clearInterval(stepTimer);
+    [2,3,4].forEach(function(i) {
+      var d = document.getElementById('step' + i + '-dot');
+      if (d) { d.className = 'step-dot done'; d.textContent = '\u2713'; }
+      var s = document.getElementById('spinner' + i);
+      if (s) s.style.display = 'none';
+    });
+    setTimeout(function() {
+      document.getElementById('loadingScreen').classList.remove('show');
+      document.getElementById('mainForm').style.display = 'none';
+      document.getElementById('success').classList.add('show');
+      window.scrollTo(0, 0);
+    }, 600);
+  }
+
+  // Upload
+  document.getElementById('productImage').addEventListener('change', function(e) {
+    var file = e.target.files && e.target.files[0];
+    if (!file) { imageBase64 = ''; return; }
+    document.getElementById('prevName').textContent = file.name;
+    document.getElementById('prevSize').textContent = (file.size / 1024 / 1024).toFixed(1) + ' MB';
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      imageBase64 = ev.target.result;
+      document.getElementById('prevImg').src = imageBase64;
+      document.getElementById('uploadPreview').classList.add('show');
+    };
+    reader.readAsDataURL(file);
+  });
+  document.getElementById('prevRm').addEventListener('click', function(e) {
+    e.stopPropagation();
+    imageBase64 = '';
+    document.getElementById('productImage').value = '';
+    document.getElementById('uploadPreview').classList.remove('show');
+    document.getElementById('prevImg').src = '';
+  });
+
+  function debugLog(msg) {
+    console.log('[CAA]', msg);
+    var box = document.getElementById('debugBox');
+    if (box) { box.style.display = 'block'; box.textContent += '\n' + new Date().toLocaleTimeString() + ' - ' + msg; }
+  }
+
+  function testBackend() {
+    debugLog('Testing backend ping...');
+    google.script.run
+      .withSuccessHandler(function(res) { debugLog('Backend OK: ' + res); alert('Backend OK: ' + res); })
+      .withFailureHandler(function(err) { debugLog('Backend ERROR: ' + err.message); alert('Backend ERROR: ' + err.message); })
+      .ping();
+  }
+
+  document.getElementById('campaignForm').addEventListener('input', updateProgress);
+
+  document.getElementById('campaignForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var c = copy[currentLang];
+    var platforms = getPlatforms();
+    if (!platforms.length) {
+      alert(currentLang === 'es' ? 'Selecciona al menos una plataforma.' : 'Select at least one platform.');
+      return;
+    }
+    var payload = {
+      businessName:        document.getElementById('businessName').value.trim(),
+      clientEmail:         document.getElementById('clientEmail').value.trim(),
+      product:             document.getElementById('product').value.trim(),
+      objective:           document.getElementById('objective').value,
+      tone:                document.getElementById('tone').value,
+      audience:            document.getElementById('audience').value.trim(),
+      platforms:           platforms,
+      specialInstructions: document.getElementById('specialInstructions').value.trim(),
+      offerOrCta:          document.getElementById('offerOrCta').value.trim(),
+      detectedLang:        currentLang,
+      imageBase64:         imageBase64,
+    };
+    if (!payload.businessName || !payload.product || !payload.clientEmail || !payload.audience) {
+      alert(currentLang === 'es' ? 'Completa los campos requeridos.' : 'Please complete required fields.');
+      return;
+    }
+    debugLog('Submitting: ' + JSON.stringify({ business: payload.businessName, hasImage: !!payload.imageBase64 }));
+    document.getElementById('submitBtn').disabled = true;
+    document.getElementById('btn-label').textContent = c.sending;
+    document.getElementById('statusText').textContent = '';
+    startLoadingAnimation();
+    google.script.run
+      .withSuccessHandler(function(res) {
+        debugLog('submitCampaign OK: ' + JSON.stringify(res));
+        stopLoadingAnimation();
+      })
+      .withFailureHandler(function(err) {
+        debugLog('submitCampaign ERROR: ' + err.message);
+        clearInterval(stepTimer);
+        document.getElementById('loadingScreen').classList.remove('show');
+        document.getElementById('submitBtn').disabled = false;
+        document.getElementById('btn-label').textContent = c.submit;
+        alert('Error: ' + err.message);
+      })
+      .submitCampaign(payload);
+  });
+
+  setLang(detectLanguage());
+  updateProgress();
+</script>
+</body>
+</html>
